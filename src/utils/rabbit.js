@@ -22,9 +22,10 @@ const initialize = async () => {
             throw error;
           }
 
-          channel.consume('thumbnailer', (message) => {
+          channel.consume('thumbnailer', async (message) => {
             console.log(message.content.toString());
-            channel.ack(message);
+            
+            await channel.ack(message);
           }, { noAck: false });
         });
       });

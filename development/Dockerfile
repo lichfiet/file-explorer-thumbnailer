@@ -5,8 +5,8 @@ WORKDIR /usr/app/
 # this will cache them and speed up future builds
 FROM base AS install
 
-# Install make and python3 for node-gyp
-RUN apk add build-base python3 make 
+# Install ffmpeg
+RUN apk add ffmpeg
 
 ## NODE MODULES
 # Install Dev Node Modules
