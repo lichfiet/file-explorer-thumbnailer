@@ -15,14 +15,14 @@ const initialize = async () => {
           console.error('Error creating channel: ', error);
           throw error;
         }
-        console.log('Channel created');
-        channel.assertQueue('hello', { durable: false }, (error, ok) => {
+
+        channel.assertQueue('thumbnailer', { }, (error, ok) => {
           if (error) {
             console.error('Error creating queue: ', error);
             throw error;
           }
-          console.log('Queue created');
-          channel.consume('hello', (message) => {
+
+          channel.consume('thumbnailer', (message) => {
             console.log(message.content.toString());
             channel.ack(message);
           }, { noAck: false });
