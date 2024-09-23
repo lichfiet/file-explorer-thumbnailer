@@ -31,6 +31,7 @@ services:
       - "8441:8441"
     environment:
       APP_NAME: "file-explorer-thumbnailer"
+      ENVIRONMENT: "development"
       PORT: "8441"
       LOG_LEVEL: "debug"
       RABBITMQ_HOST: "rabbitmq"
@@ -40,14 +41,14 @@ services:
       PG_HOST: "db"
       PG_PORT: "5432"
   backend:
-    image: file-explorer-backend:dev
+    image: lichfiet/file-explorer-backend:latest
     container_name: backend
     ports:
       - "8443:8443"
     environment:
       APP_NAME: "file-explorer-backend"
       PORT: "8443"
-      LOG_LEVEL: "debug"
+      LOG_LEVEL: "info"
       RABBITMQ_HOST: "rabbitmq"
       AWS_REGION: "${AWS_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
