@@ -5,7 +5,6 @@ include $(cnf)
 export $(shell sed 's/=.*//' $(cnf))
 
 # HELP
-# This will output the help for each task
 # thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .PHONY: help
 
@@ -16,53 +15,22 @@ help: ## This help.
 
 
 # DOCKER TASKS
-# Build the container
 build: ## Build the container
-	@echo "\n...Building Backend Container Image... \n"
 	docker build -t $(APP_NAME):dev --platform linux/amd64 -f ./development/Dockerfile . --target=dev
-	@echo "\n...Built Backend... \n"
 
 build-nc: ## Build the container without no cache
 	docker build -t $(APP_NAME):dev --platform linux/amd64 --no-cache -f ./development/Dockerfile .
 
-run: ## Run container on port configured in `config.env`
-	@echo "\n...Launching Dev Server... \n"
-	docker run -it --rm -p $(PORT):$(PORT) --name $(APP_NAME) $(APP_NAME):dev
-	@echo "\nHold ctrl and click this link 'http://localhost:${PORT}'\n"
-
-run-d: ## Run container on port configured in `config.env`
-	@echo "\n...Launching Dev Server... \n"
-	docker run -it --rm -p $(PORT):$(PORT) --name $(APP_NAME) -d $(APP_NAME):dev
-	@echo "\nHold ctrl and click this link 'http://localhost:${PORT}'\n"
-
-stop:
-	@echo "\n...Stopping Docker Container... \n"
-	docker stop ${APP_NAME}
-	@echo "\n...Docker Container Stopped... \n"
-
-rm:
-	@echo "\n...Removing Docker Container... \n"
-	docker rm ${APP_NAME}
-	@echo "\n...Docker Container Removed... \n"
-
-start-compose: ## Start node and redis in docker compose
-	@echo "\n...Launching Dev Server... \n"
+start: ## Start node and redis in docker compose
 	docker compose -f ./docker/compose.yaml up
-	@echo "\nHold ctrl and click this link 'http://localhost:8000'\n"
 
-start-compose-d: ## Start node and redis in docker compose
-	@echo "\n...Launching Dev Server... \n"
+start-d: ## Start node and redis in docker compose
 	docker compose -f ./docker/compose.yaml up -d
-	@echo "\nHold ctrl and click this link 'http://localhost:8000'\n"
 
-stop-compose: ## stop docker compose
-	@echo "\n...Stopping Docker Containers... \n"
+stop: ## stop docker compose
 	docker compose -f ./docker/compose.yaml down
 
-start-nd: ## Start node not in container
-	@echo "\n...Launching Dev Server... \n"
-	npm run dev
-	@echo "\nHold ctrl and click this link 'http://localhost:8000'\n"
+
 
 
 
@@ -82,10 +50,3 @@ init: # Initailize development environment and start it
 	docker build -t $(APP_NAME):dev --platform linux/amd64 -f ./development/Dockerfile . --target=dev
 	@echo "\n...Development Environment Successfully Initialied... \n"
 	@echo "\nType 'make help' for a list of commands\n"
-
-build-prod: ## Run for production
-	chmod u+x ./development/dev-init.sh
-	./development/dev-init.sh
-	@echo "\n...Building Web Container Image... \n"
-	docker build -t $(APP_NAME):latest --platform linux/amd64 -f ./development/Dockerfile . --target=prod
-	@echo "\n...Built Backend... \n"
