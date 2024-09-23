@@ -1,18 +1,19 @@
 const { Sequelize, DataTypes } = require("sequelize");
+const logger = require("../middlewares/log.js");
 
-const pgConnector = new Sequelize("postgres", "postgres", "password", {
-	database: process.env.PG_DATABASE,
-	username: process.env.PG_USERNAME,
-	password: process.env.PG_PASSWORD,
-	host: process.env.PG_HOST,
-	port: process.env.PG_PORT,
+const pgConnector = new Sequelize({
 	dialect: "postgres",
-	dialectOptions: {
+	dialectOptions: (process.env.PG_REQURIE_SSL === "true" ? {
 		ssl: {
 			require: true,
 			rejectUnauthorized: false,
 		},
-	},
+	} : {}),
+	database: process.env.PG_DATABASE,
+	username: process.env.PG_USERNAME,
+	password: process.env.PG_PASSWORD,
+	host: `db`,
+	port: process.env.PG_PORT,
 	logging: (msg) => logger.debug(`PG Database: ${msg}`),
 });
 
@@ -28,7 +29,7 @@ module.exports = dbController = {
 		await pgConnector.authenticate().then(() => {
 			logger.info("Connection has been established successfully.");
 		}).catch((error) => {
-			logger.error("Unable to connect to the database:", error);
+			logger.error("Unable to connect to the database:" + error);
 		});
 	},
 	refreshModels: () => {
@@ -60,5 +61,5 @@ module.exports = dbController = {
 			logger.error("Unable to delete item:", error);
 			throw error;
 		});
-	}
+	},
 };

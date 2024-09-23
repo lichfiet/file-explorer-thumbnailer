@@ -1,12 +1,15 @@
 FROM node:18-alpine as base
 WORKDIR /usr/app/
 
+ENV RABBITMQ_HOST="rabbitmq"
+ENV PG_HOST="postgres"
+
 # install dependencies into temp directory
 # this will cache them and speed up future builds
 FROM base AS install
 
 # Install ffmpeg
-RUN apk add ffmpeg
+#RUN apk add ffmpeg
 
 ## NODE MODULES
 # Install Dev Node Modules

@@ -37,8 +37,10 @@ app.use("/error", require("./routes/get/errorTest.js"));
 
 
 const rabbit = require("./utils/rabbit.js");
+const dbController = require("./utils/db.js");
 
 rabbit.initialize();
+dbController.connect();
 
 
 
