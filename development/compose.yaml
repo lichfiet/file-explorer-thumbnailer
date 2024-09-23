@@ -28,7 +28,7 @@ services:
       - ../:/usr/app/
       - /usr/app/node_modules
     ports:
-      - "${PORT:-8441}:8441"
+      - "8441:8441"
     environment:
       APP_NAME: "file-explorer-thumbnailer"
       PORT: "8441"
@@ -39,19 +39,16 @@ services:
       PG_PASSWORD: "password"
       PG_HOST: "db"
       PG_PORT: "5432"
-      LOG_LEVEL: "debug"
-      APP_NAME: "file-explorer-thumbnailer"
   backend:
-    depends_on:
-      - thumbnailer
     image: file-explorer-backend:dev
     container_name: backend
     ports:
-      - "8443":8443"
+      - "8443:8443"
     environment:
       APP_NAME: "file-explorer-backend"
       PORT: "8443"
       LOG_LEVEL: "debug"
+      RABBITMQ_HOST: "rabbitmq"
       AWS_REGION: "${AWS_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"

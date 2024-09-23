@@ -22,7 +22,7 @@ build-nc: ## Build the container without no cache
 	docker build -t $(APP_NAME):dev --platform linux/amd64 --no-cache -f ./development/Dockerfile .
 
 start: ## Start node and redis in docker compose
-	docker compose -f ./docker/compose.yaml up
+	docker compose -f ./development/compose.yaml --env-file .env up 
 
 start-d: ## Start node and redis in docker compose
 	docker compose -f ./docker/compose.yaml up -d
