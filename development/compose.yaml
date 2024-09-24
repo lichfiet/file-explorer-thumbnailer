@@ -30,7 +30,6 @@ services:
     ports:
       - "8441:8441"
     environment:
-      APP_NAME: "file-explorer-thumbnailer"
       ENVIRONMENT: "development"
       PORT: "8441"
       LOG_LEVEL: "debug"

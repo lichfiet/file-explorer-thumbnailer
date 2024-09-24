@@ -1,9 +1,45 @@
 FROM node:18-alpine as base
 WORKDIR /usr/app/
 
-ENV RABBITMQ_HOST="rabbitmq"
+################################################################################
+##
+## ENV VARS
+##
+
+# Server Config
+ENV PORT=8443
+ENV LOG_LEVEL=debug
+ENV APP_NAME="file-explorer-thumbnailer"
+ENV ENVIRONMENT="development"
+
+# RabbitMQ
+ENV RABBITMQ_HOST="localhost"
+ENV RABBITMQ_RETRY_CONNECTION_TIMEOUT=6000
+ENV RABBITMQ_RETRY_CONNECTION_ATTEMPTS=5
+
+# Postgres Connection Info
+ENV PG_DATABASE="postgres"
+ENV PG_USERNAME="postgres"
+ENV PG_PASSWORD="password"
+ENV PG_HOST="localhost"
+ENV PG_PORT="5432"
 ENV PG_HOST="postgres"
 ENV PG_RETRY_CONNECTION_TIMEOUT=5000
+ENV PG_REQURIE_SSL=false
+
+# AWS S3 Config
+ENV AWS_REGION="us-west-1"
+ENV AWS_ACCESS_KEY_ID=""
+ENV AWS_SECRET_ACCESS_KEY=""
+ENV AWS_S3_BUCKET=""
+ENV AWS_S3_ENDPOINT=""
+
+################################################################################
+
+
+
+
+
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
