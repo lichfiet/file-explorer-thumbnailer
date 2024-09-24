@@ -26,11 +26,29 @@ const Item = pgConnector.define("Item", {
 
 module.exports = dbController = {
 	connect: async () => {
-		await pgConnector.authenticate().then(() => {
-			logger.info("Connection has been established successfully.");
-		}).catch((error) => {
-			logger.error("Unable to connect to the database:" + error);
-		});
+		const attemptConnection = async (retries = process.env.PG_RETRY_CONNECTION_ATTEMPTS, delay = process.env.PG_RETRY_CONNECTION_TIMEOUT) => {
+			return new Promise((resolve, reject) => {
+				pgConnector.authenticate().then(() => {
+					console.log('Connected to Postgres');
+					resolve();
+				}).catch((error) => {
+					if (retries === 0) {
+						console.error('Error connecting to Postgres: ' + error)
+						return reject(new Error ("Unable to connect to postgres"));
+					}
+					console.error('Error connecting to Postgres. Retrying...', error);
+					setTimeout(() => {
+						attemptConnection(retries - 1, delay).then(resolve).catch(reject);
+					}, delay);
+				});
+			});
+		};
+
+		try {
+			await attemptConnection()
+		} catch (error) {
+			console.error(error.message);
+		}
 	},
 	refreshModels: () => {
 		pgConnector.sync().then(() => {

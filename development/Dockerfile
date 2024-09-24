@@ -3,6 +3,7 @@ WORKDIR /usr/app/
 
 ENV RABBITMQ_HOST="rabbitmq"
 ENV PG_HOST="postgres"
+ENV PG_RETRY_CONNECTION_TIMEOUT=5000
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds

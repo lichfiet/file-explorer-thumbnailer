@@ -3,7 +3,7 @@ const amqp = require('amqplib/callback_api');
 const initialize = async () => {
     console.log('Initializing RabbitMQ');
 
-    const attemptConnection = async (retries = 5, delay = 5000) => {
+    const attemptConnection = async (retries = process.env.RABBITMQ_RETRY_CONNECTION_ATTEMPTS, delay = process.env.RABBITMQ_RETRY_CONNECTION_TIMEOUT) => {
         return new Promise((resolve, reject) => {
             amqp.connect(`amqp://${process.env.RABBITMQ_HOST}`, (error, connection) => {
                 if (error) {
@@ -43,7 +43,7 @@ const initialize = async () => {
             });
         });
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
     }
 
 };
