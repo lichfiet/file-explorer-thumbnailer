@@ -84,7 +84,7 @@ const uploadFile = async (bucketName, key, filePathOnDisk) => {
 	};
 
 	try {
-		return uploadFile();
+		await uploadFile();
 	} catch (err) {
 		log.error(`Error Occurred Uploading File To Bucket: ${err}`);
 		return err;
