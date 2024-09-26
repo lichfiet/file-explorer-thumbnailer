@@ -41,7 +41,7 @@ const dbController = require("./utils/db.js");
 
 const s3 = require("./utils/s3.js");
 
-//s3.getFile("test.txt", {});
+s3.getFile("file-explorer-s3-bucket", "test.png");
 
 rabbit.initialize();
 dbController.connect();

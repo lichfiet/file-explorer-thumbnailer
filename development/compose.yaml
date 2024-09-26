@@ -39,6 +39,10 @@ services:
       PG_PASSWORD: "password"
       PG_HOST: "db"
       PG_PORT: "5432"
+      AWS_REGION: "${AWS_REGION}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_S3_BUCKET: "${AWS_S3_BUCKET}"
   backend:
     image: lichfiet/file-explorer-backend:latest
     container_name: backend
@@ -53,4 +57,3 @@ services:
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       AWS_S3_BUCKET: "${AWS_S3_BUCKET}"
-      AWS_S3_ENDPOINT: "${AWS_S3_ENDPOINT}"

@@ -45,14 +45,14 @@ const handleErrors = (err) => {
 	return { status: status, message: message };
 };
 
-const getFile = async (fileId, config) => {
-	log.debug(`Requesting file by uuid ${fileId} from S3 Bucket with config ${JSON.stringify(config)}`);
+const getFile = async (bucketName, key) => {
+	log.debug(`Requesting file with key ${key} from bucket ${bucketName}`);
 
-	const decodedFileId = decodeURIComponent(fileId);
+	const decodedFileName = decodeURIComponent(key);
 
-	const getFile = async (fileId, config) => {
-		const reqParams = { Bucket: "file-explorer-s3-bucket", Key: fileId };
-		const response = await s3Client.send(new GetObjectCommand(reqParams));
+	const getFile = async (bucketName, key) => {
+
+		const response = await s3Client.send(new GetObjectCommand({ Bucket: bucketName, Key: decodedFileName }));
 
 		const reponseToStream = Readable.from(response.Body);
 		const concatStream = async (stream) => {
@@ -67,11 +67,11 @@ const getFile = async (fileId, config) => {
 
 
 	try {
-		return getFile(decodedFileId, config);
+		return await getFile(bucketName, key);
 	} catch (err) {
 		return handleErrors(err);
 	} finally {
-		log.debug(`S3 Get for Filename: ${fileId} Completed`);
+		log.debug(`S3 Get for Filename: ${key} Completed`);
 	}
 };
 
