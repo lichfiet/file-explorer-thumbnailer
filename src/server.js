@@ -39,11 +39,6 @@ app.use("/error", require("./routes/get/errorTest.js"));
 const rabbit = require("./utils/rabbit.js");
 const dbController = require("./utils/db.js");
 
-const s3 = require("./utils/s3.js");
-
-s3.getFile("file-explorer-s3-bucket", "test.png");
-s3.uploadFile('./el.png', 'test.png');
-
 rabbit.initialize();
 dbController.connect();
 

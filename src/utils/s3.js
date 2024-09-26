@@ -1,6 +1,7 @@
 const log = require("../middlewares/log.js");
 const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { Readable } = require('stream');
+const fs = require('fs');
 
 /**
  * Local Vars
@@ -64,6 +65,7 @@ const getFile = async (bucketName, key) => {
 	}
 };
 
+// path.join(__dirname, 'relative path to file from usr/app/src/')
 const uploadFile = async (filePathOnDisk, key) => {
 	log.debug(`Uploading file by key: ${key} to S3 Bucket`);
 
@@ -73,7 +75,7 @@ const uploadFile = async (filePathOnDisk, key) => {
 			new PutObjectCommand({ 
 				Bucket: "file-explorer-s3-bucket", 
 				Key: decodeURI(key), 
-				Body: filePathOnDisk 
+				Body: fs.createReadStream(filePathOnDisk)
 			})
 		);
 		
