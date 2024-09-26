@@ -39,6 +39,10 @@ app.use("/error", require("./routes/get/errorTest.js"));
 const rabbit = require("./utils/rabbit.js");
 const dbController = require("./utils/db.js");
 
+const s3 = require("./utils/s3.js");
+
+//s3.getFile("test.txt", {});
+
 rabbit.initialize();
 dbController.connect();
 
