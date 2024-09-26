@@ -34,6 +34,16 @@ ENV AWS_SECRET_ACCESS_KEY=""
 
 ################################################################################
 
+# make file upload/download directory
+RUN mkdir -p /usr/file
+
+# Install ffmpeg
+RUN apk update
+RUN apk upgrade
+RUN apk add --no-cache ffmpeg
+
+
+
 
 
 
@@ -43,8 +53,6 @@ ENV AWS_SECRET_ACCESS_KEY=""
 # this will cache them and speed up future builds
 FROM base AS install
 
-# Install ffmpeg
-#RUN apk add ffmpeg
 
 ## NODE MODULES
 # Install Dev Node Modules
@@ -79,8 +87,8 @@ CMD npm run dev
 FROM base AS prod
 
 COPY --from=install /var/prod/node_modules node_modules
-COPY --from=dev /usr/app/src/ ./src/
-COPY --from=dev /usr/app/package.json package.json
+COPY --from=install /usr/app/src/ ./src/
+COPY --from=install /usr/app/package.json package.json
 
 # run the app
 EXPOSE 8443/tcp

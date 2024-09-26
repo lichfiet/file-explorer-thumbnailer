@@ -41,6 +41,8 @@ services:
       AWS_REGION: "${AWS_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      THUMBNAIL_FILES_LOCATION: "/usr/file/"
+
   backend:
     image: lichfiet/file-explorer-backend:latest
     container_name: backend

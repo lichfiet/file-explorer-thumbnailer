@@ -20,8 +20,6 @@ class s3GetRequest {
 			throw new Error("Bucket and Key must be strings");
 		} else if (bucket.length === 0 || key.length === 0) {
 			throw new Error("Bucket and Key must not be empty strings");
-		} else if (bucket.includes(" ") || key.includes(" ")) {
-			throw new Error("Bucket and Key cannot contain spaces");
 		} else if (bucket.includes("/")) {
 			throw new Error("Bucket cannot contain forward slashes");
 		}
@@ -51,12 +49,13 @@ const getFile = async (bucketName, key) => {
 			}
 			return Buffer.concat(chunks);
 		};
+
 		return concatStream(reponseToStream);
 	};
 
 
 	try {
-		return await getFile();
+		fs.writeFileSync(process.env.THUMBNAIL_FILES_LOCATION + key, await getFile());
 	} catch (err) {
 		log.error(`Error Occurred Requesting File From Bucket: ${err}`);
 		return err;
@@ -66,14 +65,14 @@ const getFile = async (bucketName, key) => {
 };
 
 // path.join(__dirname, 'relative path to file from usr/app/src/')
-const uploadFile = async (filePathOnDisk, key) => {
+const uploadFile = async (bucketName, key, filePathOnDisk) => {
 	log.debug(`Uploading file by key: ${key} to S3 Bucket`);
 
 	const uploadFile = async () => {
 		
 		const response = await s3Client.send(
 			new PutObjectCommand({ 
-				Bucket: "file-explorer-s3-bucket", 
+				Bucket: bucketName, 
 				Key: decodeURI(key), 
 				Body: fs.createReadStream(filePathOnDisk)
 			})

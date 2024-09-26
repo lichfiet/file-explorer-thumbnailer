@@ -42,7 +42,9 @@ const dbController = require("./utils/db.js");
 rabbit.initialize();
 dbController.connect();
 
+const generateThumbnail = require("./utils/generateThumbnail.js");
 
+generateThumbnail("file-explorer-s3-bucket", "Mirror Pic.jpg");
 
 
 // START SERVER
