@@ -31,8 +31,6 @@ ENV PG_REQURIE_SSL=false
 ENV AWS_REGION="us-west-1"
 ENV AWS_ACCESS_KEY_ID=""
 ENV AWS_SECRET_ACCESS_KEY=""
-ENV AWS_S3_BUCKET=""
-ENV AWS_S3_ENDPOINT=""
 
 ################################################################################
 

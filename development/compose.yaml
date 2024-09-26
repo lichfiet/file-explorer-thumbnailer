@@ -26,7 +26,6 @@ services:
     container_name: thumbnailer
     volumes:
       - ../:/usr/app/
-      - /usr/app/node_modules
     ports:
       - "8441:8441"
     environment:
