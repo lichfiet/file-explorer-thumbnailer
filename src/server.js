@@ -38,9 +38,11 @@ app.use("/error", require("./routes/get/errorTest.js"));
 
 const rabbit = require("./utils/rabbit.js");
 const dbController = require("./utils/db.js");
+const redis = require("./utils/redis.js");
 
 rabbit.initialize();
 dbController.connect();
+redis.connectRedis();
 
 const generateThumbnail = require("./utils/generateThumbnail.js");
 

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const dbController = require("../../utils/db.js");
 const amqp = require('amqplib/callback_api');
+const { redisClient, connectRedis} = require("../../utils/redis.js");
 
 router.get("/", async (req, res, next) => {
     const attemptRabbitConnection = async () => {
@@ -31,10 +32,28 @@ router.get("/", async (req, res, next) => {
         });
     };
 
+    const attemptRedisConnection = async () => {
+        return new Promise((resolve, reject) => {
+            if(redisClient.isOpen){
+                console.log("Redis Connection Already Open");
+                resolve();
+              }
+
+            redis.connectRedis().then(() => {
+                console.log("Connection has been established successfully.");
+                resolve();
+            }).catch((error) => {
+                console.error("Unable to connect to the Redis:" + error);
+                reject(new Error("Unable to connect to the Redis: " + error));
+            });
+        });
+    };
+
     try {
         
         await attemptRabbitConnection();
         await attemptPostgresConnection();
+        await attemptRedisConnection();
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.status(200).send("Server Ready");

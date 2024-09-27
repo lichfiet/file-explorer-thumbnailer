@@ -32,6 +32,11 @@ ENV AWS_REGION="us-west-1"
 ENV AWS_ACCESS_KEY_ID=""
 ENV AWS_SECRET_ACCESS_KEY=""
 
+# Redis Config
+ENV REDIS_HOST=""
+ENV REDIS_PORT="6379"
+ENV REDIS_PASSWORD=""
+
 ################################################################################
 
 # make file upload/download directory

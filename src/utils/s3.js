@@ -1,7 +1,10 @@
+
 const log = require("../middlewares/log.js");
 const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { Readable } = require('stream');
 const fs = require('fs');
+const { get } = require("http");
 
 /**
  * Local Vars
@@ -69,18 +72,12 @@ const uploadFile = async (bucketName, key, filePathOnDisk) => {
 	log.debug(`Uploading file by key: ${key} to S3 Bucket`);
 
 	const uploadFile = async () => {
-		
 		const response = await s3Client.send(
-			new PutObjectCommand({ 
-				Bucket: bucketName, 
-				Key: decodeURI(key), 
-				Body: fs.createReadStream(filePathOnDisk)
-			})
+			new PutObjectCommand({ Bucket: bucketName, Key: decodeURI(key), Body: fs.createReadStream(filePathOnDisk) })
 		);
-		
 		const responseCode = await response.$metadata.httpStatusCode;
 
-		return (await responseCode === 200) ? "File successfully uploaded to S3 Bucket" : () => { throw new Error("Error uploading file to S3 Bucket") };
+		return (await responseCode === 200) ? "File successfully uploaded to S3 Bucket" : new Error("Error uploading file to S3 Bucket")
 	};
 
 	try {
@@ -93,8 +90,25 @@ const uploadFile = async (bucketName, key, filePathOnDisk) => {
 	}
 };
 
+const generatePresignedUrl = async (bucketName, key) => {
+	log.debug(`Generating Presigned URL for file with key ${key} from bucket ${bucketName}`);
+
+	// Generate a presigned URL for the S3 object
+	let presignedUrl;
+	try {
+		presignedUrl = await getSignedUrl(s3Client, new GetObjectCommand({ Bucket: bucketName, Key: key }), { expiresIn: 60 * 2400 })
+	} catch (err) {
+		log.error(`Error Generating Presigned URL: ${err}`);
+		return err;
+	}
+
+	// The command returns a pre-signed URL
+	return presignedUrl;
+};
+
 
 module.exports = s3 = {
 		getFile,
-		uploadFile
+		uploadFile,
+		generatePresignedUrl
 	};
