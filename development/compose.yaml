@@ -56,6 +56,7 @@ services:
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ""
+      REDIS_TTL: 24000
 
   backend:
     image: lichfiet/file-explorer-backend:latest

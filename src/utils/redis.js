@@ -9,9 +9,9 @@ const redisClient = createClient({
     log: log,
 });
 
-const redisPutS3Url = async (key, url) => {
+const redisPutS3Url = async (key, value, ttl) => {
     try {
-        return await redisClient.set(key, url);
+        return await redisClient.set(key, value, { EX: ttl });
     } catch (err) {
         log.error(`Error Occurred Setting Redis Key: ${err}`);
         return err;
@@ -20,7 +20,18 @@ const redisPutS3Url = async (key, url) => {
     }
 };
 
-const connectRedis = async () => {
+const redisDeleteS3Url = async (key) => {
+    try {
+        return await redisClient.del(key);
+    } catch (err) {
+        log.error(`Error Occurred Deleting Redis Key: ${err}`);
+        return err;
+    } finally {
+        log.debug(`Redis Delete for Key: ${key} Completed`);
+    }
+};
+
+const connect = async () => {
     try {
         if (redisClient.isOpen) {
             log.debug("Redis Connection Already Open");
@@ -40,6 +51,7 @@ const connectRedis = async () => {
 
 module.exports = { 
     redisPutS3Url,
-    connectRedis,
+    redisDeleteS3Url,
+    connect,
     redisClient
 };

@@ -36,6 +36,7 @@ ENV AWS_SECRET_ACCESS_KEY=""
 ENV REDIS_HOST=""
 ENV REDIS_PORT="6379"
 ENV REDIS_PASSWORD=""
+ENV REDIS_TTL=24000
 
 ################################################################################
 

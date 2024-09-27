@@ -1,6 +1,6 @@
 
 const log = require("../middlewares/log.js");
-const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { Readable } = require('stream');
 const fs = require('fs');
@@ -67,6 +67,26 @@ const getFile = async (bucketName, key) => {
 	}
 };
 
+const deleteFile = async (bucketName, key) => {
+	log.debug(`Deleting file with key ${key} from bucket ${bucketName}`);
+
+	const deleteFile = async () => {
+		const response = await s3Client.send(new DeleteObjectCommand({ Bucket: bucketName, Key: key }));
+		const responseCode = await response.$metadata.httpStatusCode;
+
+		return (await responseCode === 200) ? "File successfully deleted from S3 Bucket" : new Error("Error deleting file from S3 Bucket")
+	};
+
+	try {
+		await deleteFile();
+	} catch (err) {
+		log.error(`Error Occurred Deleting File From Bucket: ${err}`);
+		return err;
+	} finally {
+		log.debug(`S3 Delete for Filename: ${key} Completed`);
+	}
+};
+
 // path.join(__dirname, 'relative path to file from usr/app/src/')
 const uploadFile = async (bucketName, key, filePathOnDisk) => {
 	log.debug(`Uploading file by key: ${key} to S3 Bucket`);
@@ -110,5 +130,6 @@ const generatePresignedUrl = async (bucketName, key) => {
 module.exports = s3 = {
 		getFile,
 		uploadFile,
+		deleteFile,
 		generatePresignedUrl
 	};

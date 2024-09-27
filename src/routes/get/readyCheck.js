@@ -1,45 +1,42 @@
 const express = require("express");
 const router = express.Router();
 
-const dbController = require("../../utils/db.js");
-const amqp = require('amqplib/callback_api');
-const { redisClient, connectRedis} = require("../../utils/redis.js");
+const rabbit = require("../../utils/rabbit.js");
+const redis = require("../../utils/redis.js");
+// const dbController = require("../../utils/db.js");
 
 router.get("/", async (req, res, next) => {
+
     const attemptRabbitConnection = async () => {
         return new Promise((resolve, reject) => {
-            amqp.connect(`amqp://${process.env.RABBITMQ_HOST}`, (error, connection) => {
-                if (error) {
-                    console.error('Error connecting to RabbitMQ. Retrying...', error);
-                    return reject(new Error('Error connecting to RabbitMQ: ' + error));
-                } else {
-                    console.log('Connected to RabbitMQ');
-                    resolve();
-                }
+            rabbit.connect().then(() => {
+                console.log("Connection has been established successfully."); resolve();
+            }).catch((error) => {
+                console.error("Unable to connect to RabbitMQ:" + error); reject(new Error("Unable to connect to RabbitMQ: " + error));
             });
         });
     };
 
-    const attemptPostgresConnection = async () => {
-        return new Promise((resolve, reject) => {
-            dbController.connect().then(() => {
-                console.log("Connection has been established successfully.");
-                resolve();
-            }).catch((error) => {
-                console.error("Unable to connect to the database:" + error);
-                reject(new Error("Unable to connect to the database: " + error));
-            });
-        });
-    };
+    // const attemptPostgresConnection = async () => {
+    //     return new Promise((resolve, reject) => {
+    //         dbController.connect().then(() => {
+    //             console.log("Connection has been established successfully.");
+    //             resolve();
+    //         }).catch((error) => {
+    //             console.error("Unable to connect to the database:" + error);
+    //             reject(new Error("Unable to connect to the database: " + error));
+    //         });
+    //     });
+    // };
 
     const attemptRedisConnection = async () => {
         return new Promise((resolve, reject) => {
-            if(redisClient.isOpen){
+            if (redis.redisClient.isOpen) {
                 console.log("Redis Connection Already Open");
                 resolve();
-              }
+            }
 
-            redis.connectRedis().then(() => {
+            redis.connect().then(() => {
                 console.log("Connection has been established successfully.");
                 resolve();
             }).catch((error) => {
@@ -50,9 +47,9 @@ router.get("/", async (req, res, next) => {
     };
 
     try {
-        
+
         await attemptRabbitConnection();
-        await attemptPostgresConnection();
+        // await attemptPostgresConnection();
         await attemptRedisConnection();
 
         res.setHeader("Access-Control-Allow-Origin", "*");

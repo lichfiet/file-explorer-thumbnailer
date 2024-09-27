@@ -1,8 +1,8 @@
-const s3 = require("./s3.js");
+const s3 = require("../utils/s3.js");
 const path = require("path");
-const ffmpegCreateThumbnail = require("./ffmpeg.js");
+const ffmpegCreateThumbnail = require("../utils/ffmpeg.js");
 const fs = require("fs");
-const { redisPutS3Url } = require("./redis.js");
+const { redisPutS3Url } = require("../utils/redis.js");
 
 const generateThumbnail = async (bucketName, key) => {
 
@@ -29,7 +29,7 @@ const generateThumbnail = async (bucketName, key) => {
 
     
     const generatePresignedUrl = async () =>  await s3.generatePresignedUrl(bucketName, 'thumbnail-' + key + '.png');
-    const cacheS3Url = async () => await redisPutS3Url(key, await generatePresignedUrl());
+    const cachePresignedUrl = async () => await redisPutS3Url(key, await generatePresignedUrl(), process.env.REDIS_TTL);
 
 
     try {
@@ -37,7 +37,7 @@ const generateThumbnail = async (bucketName, key) => {
         await createThumbnail();
         await uploadFile();
         await deleteFiles();
-        await cacheS3Url();
+        await cachePresignedUrl();
         console.log( await generatePresignedUrl());
     } catch (error) {
         console.error(error.message);

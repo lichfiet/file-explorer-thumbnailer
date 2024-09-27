@@ -37,16 +37,18 @@ app.use("/error", require("./routes/get/errorTest.js"));
 
 
 const rabbit = require("./utils/rabbit.js");
-const dbController = require("./utils/db.js");
+// const dbController = require("./utils/db.js");
 const redis = require("./utils/redis.js");
 
+rabbit.connect();
 rabbit.initialize();
-dbController.connect();
-redis.connectRedis();
+// dbController.connect();
+redis.connect();
 
-const generateThumbnail = require("./utils/generateThumbnail.js");
+const generateThumbnail = require("./thumbnailMethods/generateThumbnail.js");
 
-generateThumbnail("file-explorer-s3-bucket", "Mirror Pic.jpg");
+generateThumbnail("file-explorer-s3-bucket", "ellie chair.jpeg");
+
 
 
 // START SERVER
@@ -54,10 +56,10 @@ generateThumbnail("file-explorer-s3-bucket", "Mirror Pic.jpg");
 // init
 
 
-const httpServer = http.createServer(app); // create a server object
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT;
 httpServer.listen(PORT, () => {
-  console.info(`Server is running on port ${PORT}`);
+  console.info(`Server is running on port ${PORT}`); 
 });
 
 

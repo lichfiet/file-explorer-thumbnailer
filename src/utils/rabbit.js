@@ -1,46 +1,85 @@
 const amqp = require('amqplib/callback_api');
 
+let connection;
+let rabbitChannel;
+
+const attemptConnection = async (retries = process.env.RABBITMQ_RETRY_CONNECTION_ATTEMPTS, delay = process.env.RABBITMQ_RETRY_CONNECTION_TIMEOUT) => {
+    return new Promise((resolve, reject) => {
+        amqp.connect(`amqp://${process.env.RABBITMQ_HOST}`, (error, connection) => {
+            if (error) {
+                if (retries === 0) {
+                    return reject(new Error('Error connecting to RabbitMQ: ' + error));
+                }
+                console.error('Error connecting to RabbitMQ. Retrying...', error);
+                setTimeout(() => {
+                    attemptConnection(retries - 1, delay).then(resolve).catch(reject);
+                }, delay);
+            } else {
+                console.log('Connected to RabbitMQ');
+                resolve(connection);
+            }
+        });
+    });
+};
+
 const initialize = async () => {
     console.log('Initializing RabbitMQ');
 
-    const attemptConnection = async (retries = process.env.RABBITMQ_RETRY_CONNECTION_ATTEMPTS, delay = process.env.RABBITMQ_RETRY_CONNECTION_TIMEOUT) => {
-        return new Promise((resolve, reject) => {
-            amqp.connect(`amqp://${process.env.RABBITMQ_HOST}`, (error, connection) => {
-                if (error) {
-                    if (retries === 0) {
-                        return reject(new Error('Error connecting to RabbitMQ: ' + error));
-                    }
-                    console.error('Error connecting to RabbitMQ. Retrying...', error);
-                    setTimeout(() => {
-                        attemptConnection(retries - 1, delay).then(resolve).catch(reject);
-                    }, delay);
-                } else {
-                    console.log('Connected to RabbitMQ');
-                    resolve(connection);
-                }
-            });
-        });
-    };
+    connection = await attemptConnection();
 
     try {
-        const connection = await attemptConnection();
         connection.createChannel((error, channel) => {
-            if (error) {
-                console.error('Error creating channel: ', error);
-                throw error;
-            }
-
-            channel.assertQueue('thumbnailer', { }, (error, ok) => {
+            rabbitChannel = channel;
+            
+            if (error) { console.error('Error creating channel: ', error); throw error; }
+            
+            
+            // create queues
+            channel.assertQueue('generateThumbnail', {}, (error, ok) => {
                 if (error) {
-                    console.error('Error creating queue: ', error);
-                    throw error;
+                    console.error('Error creating queue: ', error); throw error;
                 }
-
-                channel.consume('thumbnailer', async (message) => {
-                    console.log(message.content.toString());
-                    await channel.ack(message);
-                }, { noAck: false });
             });
+            
+            channel.assertQueue('deleteThumbnail', {}, (error, ok) => {
+                if (error) {
+                    console.error('Error creating queue: ', error); throw error;
+                }
+            });
+            
+            channel.assertQueue('moveThumbnail', {}, (error, ok) => {
+                if (error) {
+                    console.error('Error creating queue: ', error); throw error;
+                }
+            });
+            
+
+            // consume messages
+            channel.prefetch(1);
+            channel.consume('generateThumbnail', async (message) => {
+                const generateThumbnail = require("../thumbnailMethods/generateThumbnail.js");
+                let mensaje = JSON.parse(message.content.toString());
+
+                await generateThumbnail(mensaje.bucketName, mensaje.key);
+                await channel.ack(message);
+            }, { noAck: false });
+
+            channel.consume('deleteThumbnail', async (message) => {
+                const deleteThumbnail = require("../thumbnailMethods/deleteThumbnail.js");
+                let mensaje = JSON.parse(message.content.toString());
+
+                await deleteThumbnail(mensaje.bucketName, mensaje.key);
+                await channel.ack(message);
+            }, { noAck: false });
+
+            channel.consume('moveThumbnail', async (message) => {
+                const moveThumbnail = require("../thumbnailMethods/moveThumbnail.js");
+                let mensaje = JSON.parse(message.content.toString());
+
+                await moveThumbnail(mensaje.bucketName, mensaje.key);
+                await channel.ack(message);
+            }, { noAck: false });
+
         });
     } catch (error) {
         console.error(error.message);
@@ -48,6 +87,18 @@ const initialize = async () => {
 
 };
 
+const publishPresignedUrl = async (key, value) => {
+    try {
+        await rabbitChannel.sendToQueue('urls', Buffer.from(JSON.stringify({ key: key, value: value })));
+    } catch (err) {
+        log.error(`Error Occurred Publishing to RabbitMQ: ${err}`); return err;
+    } finally {
+        log.debug(`RabbitMQ Publish for Key: ${key} Completed`);
+    }
+};
+
 module.exports = rabbit = {
-    initialize: initialize
+    initialize: initialize,
+    connect: attemptConnection,
+    publishPresignedUrl: publishPresignedUrl
 }
