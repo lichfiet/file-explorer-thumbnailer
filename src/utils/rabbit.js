@@ -47,12 +47,6 @@ const initialize = async () => {
                 }
             });
             
-            channel.assertQueue('moveThumbnail', {}, (error, ok) => {
-                if (error) {
-                    console.error('Error creating queue: ', error); throw error;
-                }
-            });
-            
 
             // consume messages
             channel.prefetch(1);
@@ -64,6 +58,7 @@ const initialize = async () => {
                 await channel.ack(message);
             }, { noAck: false });
 
+            channel.prefetch(1);
             channel.consume('deleteThumbnail', async (message) => {
                 const deleteThumbnail = require("../thumbnailMethods/deleteThumbnail.js");
                 let mensaje = JSON.parse(message.content.toString());
@@ -71,15 +66,6 @@ const initialize = async () => {
                 await deleteThumbnail(mensaje.bucketName, mensaje.key);
                 await channel.ack(message);
             }, { noAck: false });
-
-            channel.consume('moveThumbnail', async (message) => {
-                const moveThumbnail = require("../thumbnailMethods/moveThumbnail.js");
-                let mensaje = JSON.parse(message.content.toString());
-
-                await moveThumbnail(mensaje.bucketName, mensaje.key);
-                await channel.ack(message);
-            }, { noAck: false });
-
         });
     } catch (error) {
         console.error(error.message);

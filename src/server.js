@@ -40,17 +40,9 @@ const rabbit = require("./utils/rabbit.js");
 // const dbController = require("./utils/db.js");
 const redis = require("./utils/redis.js");
 
-rabbit.connect();
 rabbit.initialize();
 // dbController.connect();
 redis.connect();
-
-const generateThumbnail = require("./thumbnailMethods/generateThumbnail.js");
-
-generateThumbnail("file-explorer-s3-bucket", "ellie chair.jpeg");
-
-
-
 // START SERVER
 
 // init
