@@ -37,18 +37,12 @@ const generateThumbnail = async (bucketName, key) => {
 
 
     try {
-        if (await checkIfThumbnailExists()) {
-            console.log(`Thumbnail for key: ${key} already exists`);
-            await cachePresignedUrl();
-            return;
-        } else {
-            console.log(`Generating Thumbnail for key: ${key}`);
-            await downloadFile();
-            await createThumbnail();
-            await uploadFile();
-            await deleteFiles();
-            await cachePresignedUrl();
-        }
+        console.log(`Generating Thumbnail for key: ${key}`);
+        await downloadFile();
+        await createThumbnail();
+        await uploadFile();
+        await deleteFiles();
+        await cachePresignedUrl();
     } catch (error) {
         console.error(error.message);
     }  
