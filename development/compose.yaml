@@ -11,15 +11,6 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
 
-  db:
-    image: postgres:alpine
-    container_name: db
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: postgres
   redis:
     image: redis:alpine
     container_name: redis
@@ -32,7 +23,6 @@ services:
   thumbnailer:
     depends_on:
       - rabbitmq
-      - db
     image: file-explorer-thumbnailer:dev
     container_name: thumbnailer
     volumes:
@@ -44,19 +34,11 @@ services:
       PORT: "8441"
       LOG_LEVEL: "debug"
       RABBITMQ_HOST: "rabbitmq"
-      PG_DATABASE: "postgres"
-      PG_USERNAME: "postgres"
-      PG_PASSWORD: "password"
-      PG_HOST: "db"
-      PG_PORT: "5432"
       AWS_REGION: "${AWS_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
       THUMBNAIL_FILES_LOCATION: "/usr/file/"
       REDIS_HOST: "redis"
-      REDIS_PORT: "6379"
-      REDIS_PASSWORD: ""
-      REDIS_TTL: 24000
 
   backend:
     image: lichfiet/file-explorer-backend:latest

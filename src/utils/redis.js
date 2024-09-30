@@ -31,22 +31,29 @@ const redisDeleteS3Url = async (key) => {
     }
 };
 
-const connect = async () => {
-    try {
+const connect = async (retries = process.env.REDIS_RETRY_CONNECTION_ATTEMPTS, delay = process.env.REDIS_CONNECTION_RETRY_DELAY) => {
+    return new Promise(async (resolve, reject) => {
         if (redisClient.isOpen) {
-            log.debug("Redis Connection Already Open");
-            return;
-        } else {
-            log.debug("Redis Connection Not Open, Opening Connection");
-            await redisClient.connect();
+            logger.debug("Redis Connection Already Open");
+            return resolve();
         }
-    } catch (err) {
-        log.error(`Error Occurred Connecting to Redis: ${err}`);
-        return err;
-    } finally {
-        log.debug(`Redis Connection Completed`);
-    }
-};
+
+        await redisClient.connect().then(async (connection, error) => {
+            if (error) {
+                if (retries === 0) {
+                    return reject(new Error('Error connecting to Redis: ' + error));
+                }
+                console.error('Error connecting to Redis. Retrying...', error);
+                setTimeout(() => {
+                    attemptConnection(retries - 1, delay).then(resolve).catch(reject);
+                }, delay);
+            } else {
+                console.log('Connected to Redis');
+                resolve();
+            }
+        });
+    });
+  };
 
 
 module.exports = { 
