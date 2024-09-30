@@ -8,9 +8,9 @@ WORKDIR /usr/app/
 
 # Server Config
 ENV PORT=8441
-ENV LOG_LEVEL=debug
+ENV LOG_LEVEL=info
 ENV APP_NAME="file-explorer-thumbnailer"
-ENV ENVIRONMENT="development"
+ENV ENVIRONMENT="production"
 
 # RabbitMQ
 ENV RABBITMQ_HOST="NO_RABBITMQ_HOST_DEFINED"
