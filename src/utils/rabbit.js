@@ -73,18 +73,8 @@ const initialize = async () => {
 
 };
 
-const publishPresignedUrl = async (key, value) => {
-    try {
-        await rabbitChannel.sendToQueue('urls', Buffer.from(JSON.stringify({ key: key, value: value })));
-    } catch (err) {
-        log.error(`Error Occurred Publishing to RabbitMQ: ${err}`); return err;
-    } finally {
-        log.debug(`RabbitMQ Publish for Key: ${key} Completed`);
-    }
-};
 
 module.exports = rabbit = {
     initialize: initialize,
-    connect: attemptConnection,
-    publishPresignedUrl: publishPresignedUrl
+    connect: attemptConnection
 }

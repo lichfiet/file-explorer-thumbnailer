@@ -48,8 +48,8 @@ services:
     environment:
       APP_NAME: "file-explorer-backend"
       PORT: "8443"
-      LOG_LEVEL: "info"
       RABBITMQ_HOST: "rabbitmq"
+      REDIS_HOST: "redis"
       AWS_REGION: "${AWS_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"

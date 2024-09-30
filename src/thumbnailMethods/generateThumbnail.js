@@ -33,6 +33,7 @@ const generateThumbnail = async (bucketName, key) => {
 
 
     try {
+        console.log(`Generating Thumbnail for key: ${key}`);
         await downloadFile();
         await createThumbnail();
         await uploadFile();
