@@ -126,10 +126,31 @@ const generatePresignedUrl = async (bucketName, key) => {
 	return presignedUrl;
 };
 
+const checkIfFileExists = async (bucketName, key) => {
+	log.debug(`Checking if file with key ${key} exists in bucket ${bucketName}`);
+
+	const checkIfFileExists = async () => {
+		const response = await s3Client.send(new GetObjectCommand({ Bucket: bucketName, Key: key }));
+		const responseCode = await response.$metadata.httpStatusCode;
+
+		return (await responseCode === 200) ? true : false;
+	};
+
+	try {
+		return await checkIfFileExists();
+	} catch (err) {
+		log.error(`Error Occurred Checking If File Exists In Bucket: ${err}`);
+		return err;
+	} finally {
+		log.debug(`S3 Check If File Exists for Filename: ${key} Completed`);
+	}
+};
+
 
 module.exports = s3 = {
 		getFile,
 		uploadFile,
 		deleteFile,
-		generatePresignedUrl
+		generatePresignedUrl,
+		checkIfFileExists
 	};

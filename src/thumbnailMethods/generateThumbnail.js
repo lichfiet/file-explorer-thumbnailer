@@ -8,6 +8,10 @@ const generateThumbnail = async (bucketName, key) => {
 
     const filePathOnDisk = path.join(process.env.THUMBNAIL_FILES_LOCATION, key);
     const thumbnailPathOnDisk = path.join(process.env.THUMBNAIL_FILES_LOCATION, 'thumbnail-' + key + '.png');
+
+    const checkIfThumbnailExists = async () => {
+        return await s3.checkIfFileExists(bucketName, 'thumbnail-' + key + '.png');
+    };
     
     const downloadFile = async () => { 
         return await s3.getFile(bucketName, key) 
@@ -33,13 +37,18 @@ const generateThumbnail = async (bucketName, key) => {
 
 
     try {
-        console.log(`Generating Thumbnail for key: ${key}`);
-        await downloadFile();
-        await createThumbnail();
-        await uploadFile();
-        await deleteFiles();
-        await cachePresignedUrl();
-        console.log( await generatePresignedUrl());
+        if (await checkIfThumbnailExists()) {
+            console.log(`Thumbnail for key: ${key} already exists`);
+            await cachePresignedUrl();
+            return;
+        } else {
+            console.log(`Generating Thumbnail for key: ${key}`);
+            await downloadFile();
+            await createThumbnail();
+            await uploadFile();
+            await deleteFiles();
+            await cachePresignedUrl();
+        }
     } catch (error) {
         console.error(error.message);
     }  
