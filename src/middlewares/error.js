@@ -1,4 +1,4 @@
-const log = require('./log.js');
+const { log } = require('./log.js');
 
 module.exports = (err, req, res, next) => {
     console.error(err.stack);

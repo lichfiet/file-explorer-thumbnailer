@@ -1,4 +1,4 @@
-const log = require("./middlewares/log.js");
+const { log } = require("./middlewares/log.js");
 log.info("Starting Server"); // log startup, override console.log
 
 

@@ -1,5 +1,5 @@
 const { createClient } = require("redis");
-const log = require("../middlewares/log.js");
+const { log } = require("../middlewares/log.js");
 
 // Config for Redis is stored in .env file, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
 const redisClient = createClient({

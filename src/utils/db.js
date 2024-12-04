@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const logger = require("../middlewares/log.js");
+const { log } = require("../middlewares/log.js");
+const logger = log
 
 const pgConnector = new Sequelize({
 	dialect: "postgres",
